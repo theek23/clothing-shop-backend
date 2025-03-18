@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
+// Protect Routes (Require Login)
 exports.protect = async (req, res, next) => {
     let token;
     if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
@@ -16,14 +17,24 @@ exports.protect = async (req, res, next) => {
         req.user = await User.findById(decoded.id).select("-password");
         next();
     } catch (error) {
-        res.status(401).json({ message: "Token failed" });
+        res.status(401).json({ message: "Invalid token" });
     }
 };
 
+// Admin Only Access
 exports.admin = (req, res, next) => {
     if (req.user && req.user.role === "admin") {
         next();
     } else {
-        res.status(403).json({ message: "Not authorized as admin" });
+        res.status(403).json({ message: "Access denied: Admins only" });
+    }
+};
+
+// Customers Only Access (if needed)
+exports.customer = (req, res, next) => {
+    if (req.user && req.user.role === "customer") {
+        next();
+    } else {
+        res.status(403).json({ message: "Access denied: Customers only" });
     }
 };

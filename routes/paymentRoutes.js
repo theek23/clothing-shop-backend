@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const paymentController = require("../controllers/paymentController");
-const { protect } = require("../middleware/authMiddleware");
+const { protect, customer } = require("../middleware/authMiddleware");
 
-router.post("/", protect, paymentController.createPayment);
-router.get("/:id", protect, paymentController.getPaymentById);
+router.post("/", protect, customer, paymentController.createPayment);  // Customers only
+router.get("/:id", protect, paymentController.getPaymentById);  // Logged-in users
 
 module.exports = router;
